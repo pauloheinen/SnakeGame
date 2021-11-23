@@ -13,12 +13,12 @@ public class snake {
     private BufferedImage image;
     // current position of the player on the board grid
     private Point pos;
+    private Point lastpos;
     // direction that the snake's head is going
     private String direction;
     // check if the snake has collide into a border
     private boolean collision = false;
-    // the snake length
-    private int length;
+    private int length = 0;
 
 
 
@@ -26,22 +26,23 @@ public class snake {
 
         // load the assets
         loadImage();
-
+        length++;
         // initialize the state
-        pos = new Point(0, 0);
-        length = 1;
+        pos = new Point(1, 0);
+        lastpos = new Point(0, 0);
         direction = "right";
 
     }
 
-    public snake(int x, int y) {
+    public snake(Point p) {
+
         // load the assets
         loadImage();
 
         // initialize the state
-        pos = getPos();
-        length = getLength();
-        direction = getDirection();
+        pos = new Point(p);
+        lastpos = pos;
+        length++;
 
     }
 
@@ -121,8 +122,17 @@ public class snake {
 
 
 
+
     public Point getPos() {
         return pos;
+    }
+
+    public Point getLastpos() {
+        return lastpos;
+    }
+
+    public int getLength() {
+        return length;
     }
 
     public String getDirection() {
@@ -133,11 +143,12 @@ public class snake {
         return collision;
     }
 
-    public int getLength(){
-        return length;
+    public void setPos(Point pos) {
+        this.pos = pos;
     }
 
-    public void setLength(int length) {
-        this.length = length;
+    public void setLastpos(Point lastpos) {
+        this.lastpos = lastpos;
     }
+
 }

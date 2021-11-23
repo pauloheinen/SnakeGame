@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Random;
 
 // https://www.youtube.com/watch?v=PJLLDpaLjds&ab_channel=LearnCodeByGaming
@@ -15,7 +16,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     private Timer timer;
 
-    private snake player;
+    private ArrayList<snake> player = new ArrayList<snake>();
     private food apple;
 
     private int count = 0;
@@ -23,7 +24,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
-    public static final int DELAY = 300;
+    public static final int DELAY = 600;
     public static final int TILE_SIZE = 15;
     public static final int COLUMNS = WIDTH/TILE_SIZE;
     public static final int ROWS = HEIGHT/TILE_SIZE;
@@ -35,7 +36,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.black);
         // initialize the game state
-        player = new snake();
+        player.add(new snake());
         spawnFood();
         // this timer will call the actionPerformed() method every DELAY ms
         timer = new Timer(DELAY, this);
@@ -49,19 +50,22 @@ public class map extends JPanel implements KeyListener, ActionListener {
         // use this space to update the state of your game or animation
         // before the graphics are redrawn.
 
+
+
+
         // prevent the player from disappearing off the board
+        player.get(0).tick();
         move();
-        player.tick();
         checkCollisionFood();
         checkCollisionBorder();
 
-        System.out.println(player.getPos());
-        System.out.println(apple.getPos());
-        System.out.println(player.getLength());
 
+
+        //checkFollow();
         // calling repaint() will trigger paintComponent() to run again,
         // which will refresh/redraw the graphics.
         repaint();
+
     }
 
     @Override
@@ -74,7 +78,10 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
         // draw our graphics.
         drawBackground(g);
-        player.draw(g, this);
+        for (snake node : player){
+            node.draw(g, this);
+
+        }
         apple.draw(g, this);
 
         // this smooths out animations on some systems
@@ -89,7 +96,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // react to key down events
-        player.keyPressed(e);
+        player.get(0).keyPressed(e);
     }
 
     @Override
@@ -119,33 +126,56 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     private void move(){
 
-        if (player.getDirection().equals("up")){
-            player.getPos().translate(0, -1);
+        Point p = player.get(0).getPos().getLocation();
+        player.get(0).setLastpos(p);
+
+
+        for (int i = 1; i < player.size(); i++) {
+            player.get(i).setLastpos(player.get(i).getPos());
+            player.get(i).setPos(player.get(i-1).getLastpos());
+
         }
-        if (player.getDirection().equals("right")){
-            player.getPos().translate(1, 0);
+
+        if (player.get(0).getDirection().equals("up")){
+            player.get(0).getPos().move(player.get(0).getPos().x,player.get(0).getPos().y-1);
         }
-        if (player.getDirection().equals("down")){
-            player.getPos().translate(0, 1);
+        if (player.get(0).getDirection().equals("right")){
+            player.get(0).getPos().move(player.get(0).getPos().x+1,player.get(0).getPos().y);
         }
-        if (player.getDirection().equals("left")){
-            player.getPos().translate(-1, 0);
+        if (player.get(0).getDirection().equals("down")){
+            player.get(0).getPos().move(player.get(0).getPos().x,player.get(0).getPos().y+1);
         }
+        if (player.get(0).getDirection().equals("left")){
+            player.get(0).getPos().move(player.get(0).getPos().x-1,player.get(0).getPos().y);
+
+        }
+        System.out.println("-------------[" + player.size() + "]-------------");
+        for (int i = 0; i < player.size(); i++) {
+            System.out.println("[" + i + "]");
+            System.out.println(player.get(i).getPos());
+            System.out.println(player.get(i).getLastpos());
+            System.out.println();
+
+        }
+        System.out.println("----------------------------");
+
+
+
+
 
     }
 
     private void checkCollisionBorder() {
-        if (player.isCollision())
+        if (player.get(0).isCollision())
             timer.stop();
     }
 
     private void checkCollisionFood() {
 
-        if (player.getPos().equals(apple.getPos())) {
+        if (player.get(0).getPos().equals(apple.getPos())) {
             spawnFood();
-            player.setLength(player.getLength() + 1);
-            newSnake();
-
+            Point p = player.get(player.size()-1).getLastpos();
+            player.add(new snake(p));
         }
 
     }
@@ -159,7 +189,11 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     }
 
-    private void newSnake(){
-        snake player1 = new snake(player.getPos().x-1, player.getPos().y-1);
+    private void checkFollow(){
+
+        System.out.println(player.get(0).getPos());
+        System.out.println(player.get(0).getLastpos());
+
     }
+
 }
