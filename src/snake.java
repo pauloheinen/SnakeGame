@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class snake {
 
@@ -21,7 +20,7 @@ public class snake {
     // if the player already pressed any movement key
     private boolean movementSetted;
     // check if the snake has collide into a border
-    private boolean collision = false;
+    private boolean collision;
 
 
     // the head's snake
@@ -47,7 +46,6 @@ public class snake {
         lastpos = pos;
 
     }
-
 
     // methods from listeners and jpanel
     public void draw(Graphics g, ImageObserver observer) {

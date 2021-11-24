@@ -1,5 +1,3 @@
-import org.w3c.dom.ranges.Range;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,7 +15,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
     private Timer timer;
     private Random random = new Random();
 
-    private ArrayList<snake> player = new ArrayList<snake>();
+    private ArrayList<snake> player = new ArrayList<>();
     private food apple;
     private int points = 0;
 
@@ -28,7 +26,6 @@ public class map extends JPanel implements KeyListener, ActionListener {
     public static final int TILE_SIZE = 15;
     public static final int COLUMNS = WIDTH/TILE_SIZE;
     public static final int ROWS = HEIGHT/TILE_SIZE;
-
 
 
     public map(){
@@ -46,6 +43,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         // this method is called by the timer every DELAY ms.
         // use this space to update the state of your game or animation
         // before the graphics are redrawn.
@@ -62,6 +60,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
         // calling repaint() will trigger paintComponent() to run again,
         // which will refresh/redraw the graphics.
         repaint();
+
     }
 
     @Override
@@ -201,6 +200,5 @@ public class map extends JPanel implements KeyListener, ActionListener {
             player.get(0).getPos().move(player.get(0).getPos().x - 1, player.get(0).getPos().y);
 
     }
-
 
 }

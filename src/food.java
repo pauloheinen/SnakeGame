@@ -4,16 +4,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 public class food {
 
     private BufferedImage image;
-    private Point pos;
-
-
+    private final Point pos;
 
     public food(Point p) {
+
         loadImage();
         pos = new Point(p);
 
@@ -36,8 +34,8 @@ public class food {
 
     }
 
-
     public Point getPos() {
         return pos;
     }
+
 }
