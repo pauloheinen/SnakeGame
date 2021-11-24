@@ -15,16 +15,16 @@ import java.util.Random;
 public class map extends JPanel implements KeyListener, ActionListener {
 
     private Timer timer;
+    private Random random = new Random();
 
     private ArrayList<snake> player = new ArrayList<snake>();
     private food apple;
+    private int points = 0;
 
-    private int count = 0;
-    private Random random = new Random();
-
+    // map's configs
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
-    public static final int DELAY = 600;
+    public static final int DELAY = 380;
     public static final int TILE_SIZE = 15;
     public static final int COLUMNS = WIDTH/TILE_SIZE;
     public static final int ROWS = HEIGHT/TILE_SIZE;
@@ -50,22 +50,18 @@ public class map extends JPanel implements KeyListener, ActionListener {
         // use this space to update the state of your game or animation
         // before the graphics are redrawn.
 
-
-
-
-        // prevent the player from disappearing off the board
-        player.get(0).tick();
         move();
+        player.get(0).setMovementSetted(false);
+        // prevent the player from disappearing off the board
+        if (player.get(0).tick())
+            timer.stop();
+        checkCollisionItself();
         checkCollisionFood();
-        checkCollisionBorder();
+        System.out.println(timer.getDelay());
 
-
-
-        //checkFollow();
         // calling repaint() will trigger paintComponent() to run again,
         // which will refresh/redraw the graphics.
         repaint();
-
     }
 
     @Override
@@ -105,8 +101,8 @@ public class map extends JPanel implements KeyListener, ActionListener {
     }
 
     private void drawBackground(Graphics g) {
-        // draw a checkered background
 
+        // draw a checkered background
         // draw rectangles to watch better the X, Y thing while in development
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLUMNS; col++) {
@@ -122,78 +118,89 @@ public class map extends JPanel implements KeyListener, ActionListener {
                 }
             }
         }
+
     }
 
     private void move(){
 
+        /// sets the head's last position
         Point p = player.get(0).getPos().getLocation();
         player.get(0).setLastpos(p);
 
-
+        // sets the rest of the body's last position
         for (int i = 1; i < player.size(); i++) {
             player.get(i).setLastpos(player.get(i).getPos());
             player.get(i).setPos(player.get(i-1).getLastpos());
-
         }
 
-        if (player.get(0).getDirection().equals("up")){
-            player.get(0).getPos().move(player.get(0).getPos().x,player.get(0).getPos().y-1);
-        }
-        if (player.get(0).getDirection().equals("right")){
-            player.get(0).getPos().move(player.get(0).getPos().x+1,player.get(0).getPos().y);
-        }
-        if (player.get(0).getDirection().equals("down")){
-            player.get(0).getPos().move(player.get(0).getPos().x,player.get(0).getPos().y+1);
-        }
-        if (player.get(0).getDirection().equals("left")){
-            player.get(0).getPos().move(player.get(0).getPos().x-1,player.get(0).getPos().y);
+        setDirection();
 
-        }
+        /*
+        // for debug purpose
         System.out.println("-------------[" + player.size() + "]-------------");
         for (int i = 0; i < player.size(); i++) {
             System.out.println("[" + i + "]");
             System.out.println(player.get(i).getPos());
             System.out.println(player.get(i).getLastpos());
             System.out.println();
-
         }
         System.out.println("----------------------------");
+         */
 
-
-
-
-
-    }
-
-    private void checkCollisionBorder() {
-        if (player.get(0).isCollision())
-            timer.stop();
     }
 
     private void checkCollisionFood() {
 
         if (player.get(0).getPos().equals(apple.getPos())) {
-            spawnFood();
             Point p = player.get(player.size()-1).getLastpos();
             player.add(new snake(p));
+            spawnFood();
+        }
+
+    }
+
+    private void checkCollisionItself(){
+
+        for (int i = 0; i < player.size()-1; i++) {
+            for (int j = i+1; j < player.size()-1; j++) {
+
+                if (player.get(j).getPos().equals(player.get(i).getPos()))
+                    timer.stop();
+
+            }
         }
 
     }
 
     private void spawnFood(){
 
-        int x = random.nextInt(ROWS);
-        int y = random.nextInt(COLUMNS);
+        Point p = new Point(random.nextInt(ROWS), random.nextInt(COLUMNS));
 
-        apple = new food(x, y);
+        apple = new food(p);
+        points++;
+
+        // for every 5 points increases the game speed
+        if (points % 5 == 0)
+            // +10% game speed
+            timer.setDelay(timer.getDelay()-(timer.getDelay()/10));
+
+    }
+
+    private void setDirection(){
+
+        if (player.get(0).getDirection().equals("up"))
+            player.get(0).getPos().move(player.get(0).getPos().x, player.get(0).getPos().y - 1);
+
+        if (player.get(0).getDirection().equals("right"))
+            player.get(0).getPos().move(player.get(0).getPos().x + 1, player.get(0).getPos().y);
+
+        if (player.get(0).getDirection().equals("down"))
+            player.get(0).getPos().move(player.get(0).getPos().x, player.get(0).getPos().y + 1);
+
+        if (player.get(0).getDirection().equals("left"))
+            player.get(0).getPos().move(player.get(0).getPos().x - 1, player.get(0).getPos().y);
 
     }
 
-    private void checkFollow(){
-
-        System.out.println(player.get(0).getPos());
-        System.out.println(player.get(0).getLastpos());
-
-    }
 
 }

@@ -13,9 +13,9 @@ public class food {
 
 
 
-    public food(int x, int y) {
+    public food(Point p) {
         loadImage();
-        pos = new Point(x, y);
+        pos = new Point(p);
 
     }
 

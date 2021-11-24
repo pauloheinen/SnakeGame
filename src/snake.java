@@ -13,20 +13,22 @@ public class snake {
     private BufferedImage image;
     // current position of the player on the board grid
     private Point pos;
+    // last position that the snake's tile was
     private Point lastpos;
-    // direction that the snake's head is going
+    // only useful for snake's head
+    // direction that the snake's head is going to
     private String direction;
+    // if the player already pressed any movement key
+    private boolean movementSetted;
     // check if the snake has collide into a border
     private boolean collision = false;
-    private int length = 0;
 
 
-
+    // the head's snake
     public snake() {
 
         // load the assets
         loadImage();
-        length++;
         // initialize the state
         pos = new Point(1, 0);
         lastpos = new Point(0, 0);
@@ -34,6 +36,7 @@ public class snake {
 
     }
 
+    // the body's snake
     public snake(Point p) {
 
         // load the assets
@@ -42,20 +45,11 @@ public class snake {
         // initialize the state
         pos = new Point(p);
         lastpos = pos;
-        length++;
 
     }
 
-    private void loadImage() {
 
-        try {
-            image = ImageIO.read(new File("Images/snake.png"));
-        } catch (IOException exc) {
-            System.out.println("Error opening image file: " + exc.getMessage());
-        }
-
-    }
-
+    // methods from listeners and jpanel
     public void draw(Graphics g, ImageObserver observer) {
 
         // draw the player in TILE SIZE, so you can "walk" a tile each time
@@ -68,61 +62,72 @@ public class snake {
         // get the key pressed and compares to the key event button
         int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_UP) {
-            if (!direction.equals("down")){
-                direction = "up";
+        if (!movementSetted) {
+            if (key == KeyEvent.VK_UP) {
+                if (!direction.equals("down")) {
+                    direction = "up";
+                    setMovementSetted(true);
+                }
             }
-        }
-        if (key == KeyEvent.VK_RIGHT) {
-            if (!direction.equals("left")){
-                direction = "right";
+            else if (key == KeyEvent.VK_RIGHT) {
+                if (!direction.equals("left")) {
+                    direction = "right";
+                    setMovementSetted(true);
+                }
             }
-        }
-        if (key == KeyEvent.VK_DOWN) {
-            if (!direction.equals("up")){
-                direction = "down";
-
+            else if (key == KeyEvent.VK_DOWN) {
+                if (!direction.equals("up")) {
+                    direction = "down";
+                    setMovementSetted(true);
+                }
             }
-        }
-        if (key == KeyEvent.VK_LEFT) {
-            if (!direction.equals("right")){
-                direction = "left";
-
+            else if (key == KeyEvent.VK_LEFT) {
+                if (!direction.equals("right")) {
+                    direction = "left";
+                    setMovementSetted(true);
+                }
             }
         }
 
     }
 
-    public void tick() {
+    // methods created
+    private void loadImage() {
+
+        try {
+            image = ImageIO.read(new File("Images/snake.png"));
+        } catch (IOException exc) {
+            System.out.println("Error opening image file: " + exc.getMessage());
+        }
+
+    }
+
+    public boolean tick() {
 
         // this gets called once every tick, before the repainting process happens
         // prevent the player from moving off the edge of the board sideways
         if (pos.x < 0) {
             pos.x = 0;
-            collision = true;
+            return true;
         }
         if (pos.x >= map.ROWS) {
             pos.x = map.ROWS - 1;
-            collision = true;
+            return true;
         }
         // prevent the player from moving off the edge of the board vertically
         if (pos.y < 0) {
             pos.y = 0;
-            collision = true;
+            return true;
         }
         if (pos.y >= map.COLUMNS) {
             pos.y = map.COLUMNS - 1;
-            collision = true;
+            return true;
         }
-        System.out.println("collision: " + collision);
+        return false;
 
     }
 
-
-
-
-
-
+    // getters and setters
     public Point getPos() {
         return pos;
     }
@@ -131,16 +136,8 @@ public class snake {
         return lastpos;
     }
 
-    public int getLength() {
-        return length;
-    }
-
     public String getDirection() {
         return direction;
-    }
-
-    public boolean isCollision() {
-        return collision;
     }
 
     public void setPos(Point pos) {
@@ -149,6 +146,14 @@ public class snake {
 
     public void setLastpos(Point lastpos) {
         this.lastpos = lastpos;
+    }
+
+    public boolean isMovementSetted() {
+        return movementSetted;
+    }
+
+    public void setMovementSetted(boolean movementSetted) {
+        this.movementSetted = movementSetted;
     }
 
 }
