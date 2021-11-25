@@ -2,10 +2,10 @@ import javax.swing.*;
 
 public class main {
 
-
     public static void main (String[] args){
+
         windowInit windowInit = new windowInit();
-        SwingUtilities.invokeLater(windowInit::teste);
+        SwingUtilities.invokeLater(windowInit::mySnakes);
 
     }
 }

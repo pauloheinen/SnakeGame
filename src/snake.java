@@ -19,18 +19,16 @@ public class snake {
     private String direction;
     // if the player already pressed any movement key
     private boolean movementSetted;
-    // check if the snake has collide into a border
-    private boolean collision;
 
 
     // the head's snake
     public snake() {
 
         // load the assets
-        loadImage();
+        loadImage("Images/snakehead.png");
         // initialize the state
-        pos = new Point(1, 0);
-        lastpos = new Point(0, 0);
+        pos = new Point(2, 0);
+        lastpos = new Point(1, 0);
         direction = "right";
 
     }
@@ -39,7 +37,7 @@ public class snake {
     public snake(Point p) {
 
         // load the assets
-        loadImage();
+        loadImage("Images/snakebody.png");
 
         // initialize the state
         pos = new Point(p);
@@ -90,10 +88,10 @@ public class snake {
     }
 
     // methods created
-    private void loadImage() {
+    private void loadImage(String path) {
 
         try {
-            image = ImageIO.read(new File("Images/snake.png"));
+            image = ImageIO.read(new File(path));
         } catch (IOException exc) {
             System.out.println("Error opening image file: " + exc.getMessage());
         }
@@ -144,10 +142,6 @@ public class snake {
 
     public void setLastpos(Point lastpos) {
         this.lastpos = lastpos;
-    }
-
-    public boolean isMovementSetted() {
-        return movementSetted;
     }
 
     public void setMovementSetted(boolean movementSetted) {

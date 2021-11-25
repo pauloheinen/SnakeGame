@@ -7,23 +7,21 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-// https://www.youtube.com/watch?v=PJLLDpaLjds&ab_channel=LearnCodeByGaming
-// https://github.com/learncodebygaming/java_2d_game/blob/master/Board.java
 
 public class map extends JPanel implements KeyListener, ActionListener {
 
-    private Timer timer;
-    private Random random = new Random();
+    private final Timer timer;
+    private final Random random = new Random();
 
-    private ArrayList<snake> player = new ArrayList<>();
-    private food apple;
+    private final ArrayList<snake> player = new ArrayList<>();
+    private final ArrayList<food> apple = new ArrayList<>();
     private int points = 0;
 
     // map's configs
-    public static final int WIDTH = 400;
-    public static final int HEIGHT = 400;
-    public static final int DELAY = 380;
-    public static final int TILE_SIZE = 15;
+    public static final int WIDTH = 300;
+    public static final int HEIGHT = 300;
+    public static final int DELAY = 420;
+    public static final int TILE_SIZE = 25;
     public static final int COLUMNS = WIDTH/TILE_SIZE;
     public static final int ROWS = HEIGHT/TILE_SIZE;
 
@@ -34,7 +32,10 @@ public class map extends JPanel implements KeyListener, ActionListener {
         setBackground(Color.black);
         // initialize the game state
         player.add(new snake());
-        spawnFood();
+        player.add(new snake(new Point(player.get(player.size()-1).getLastpos())));
+        for (int i = 0; i < 6; i++)
+            spawnFood();
+
         // this timer will call the actionPerformed() method every DELAY ms
         timer = new Timer(DELAY, this);
         timer.start();
@@ -45,17 +46,16 @@ public class map extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         // this method is called by the timer every DELAY ms.
-        // use this space to update the state of your game or animation
-        // before the graphics are redrawn.
 
         move();
         player.get(0).setMovementSetted(false);
         // prevent the player from disappearing off the board
         if (player.get(0).tick())
             timer.stop();
+
         checkCollisionItself();
-        checkCollisionFood();
-        System.out.println(timer.getDelay());
+        if (checkCollisionFood())
+            spawnFood();
 
         // calling repaint() will trigger paintComponent() to run again,
         // which will refresh/redraw the graphics.
@@ -65,6 +65,7 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void paintComponent(Graphics g) {
+
         super.paintComponent(g);
         // when calling g.drawImage() we can use "this" for the ImageObserver
         // because Component implements the ImageObserver interface, and JPanel
@@ -73,14 +74,16 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
         // draw our graphics.
         drawBackground(g);
-        for (snake node : player){
+        for (snake node : player)
             node.draw(g, this);
 
+        for (food apple: apple) {
+            apple.draw(g, this);
         }
-        apple.draw(g, this);
 
         // this smooths out animations on some systems
         Toolkit.getDefaultToolkit().sync();
+
     }
 
     @Override
@@ -101,10 +104,18 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     private void drawBackground(Graphics g) {
 
+        // setting fonts configs
+        String s = Integer.toString(points);
+        g.setFont(new Font(Font.SERIF, Font.BOLD, 18));
+        g.setColor(Color.white);
+        g.drawString(s, WIDTH-20, HEIGHT-5);
+
         // draw a checkered background
         // draw rectangles to watch better the X, Y thing while in development
+        g.setColor(Color.darkGray);
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLUMNS; col++) {
+
                 // only color every other tile
                 if ((row + col) % 2 == 1) {
                     // draw a square tile at the current row/column position
@@ -114,12 +125,14 @@ public class map extends JPanel implements KeyListener, ActionListener {
                             TILE_SIZE,
                             TILE_SIZE
                     );
+
                 }
             }
         }
 
     }
 
+    // sets the snake's position for future drawing
     private void move(){
 
         /// sets the head's last position
@@ -134,57 +147,59 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
         setDirection();
 
-        /*
-        // for debug purpose
-        System.out.println("-------------[" + player.size() + "]-------------");
-        for (int i = 0; i < player.size(); i++) {
-            System.out.println("[" + i + "]");
-            System.out.println(player.get(i).getPos());
-            System.out.println(player.get(i).getLastpos());
-            System.out.println();
-        }
-        System.out.println("----------------------------");
-         */
-
     }
 
-    private void checkCollisionFood() {
+    // check if the snake collides into an apple and increases game speed
+    private boolean checkCollisionFood() {
 
-        if (player.get(0).getPos().equals(apple.getPos())) {
-            Point p = player.get(player.size()-1).getLastpos();
-            player.add(new snake(p));
-            spawnFood();
-        }
+        for (food node: apple) {
+            if (player.get(0).getPos().equals(node.getPos())) {
 
-    }
+                points++;
+                // for every 10 points increases the game speed
+                if (points % 10 == 0)
+                    // +8% game speed
+                    timer.setDelay(timer.getDelay()-(timer.getDelay()/8));
 
-    private void checkCollisionItself(){
-
-        for (int i = 0; i < player.size()-1; i++) {
-            for (int j = i+1; j < player.size()-1; j++) {
-
-                if (player.get(j).getPos().equals(player.get(i).getPos()))
-                    timer.stop();
-
+                Point p = player.get(player.size()-1).getLastpos();
+                player.add(new snake(p));
+                apple.remove(node);
+                return true;
             }
         }
+        return false;
 
     }
 
+    // check if the snake hit himself
+    private void checkCollisionItself(){
+
+        for (int i = 1; i < player.size()-1; i++)
+            if (player.get(0).getPos().equals(player.get(i).getPos()))
+                timer.stop();
+
+    }
+
+    // verifies and spawn a food in a grid that snake doesn't occupy
     private void spawnFood(){
 
         Point p = new Point(random.nextInt(ROWS), random.nextInt(COLUMNS));
 
-        apple = new food(p);
-        points++;
+        // for to verify if the new Point p is occupied
+        for (int j = 0; j < player.size()-1; j++) {
 
-        // for every 5 points increases the game speed
-        if (points % 5 == 0)
-            // +10% game speed
-            timer.setDelay(timer.getDelay()-(timer.getDelay()/10));
+            if (player.get(j).getPos().equals(p)) {
+                p.move(random.nextInt(ROWS), random.nextInt(COLUMNS));
+                j = 0;
+            }
+
+        }
+
+        apple.add(new food(p));
 
     }
 
+    // method that moves the head from the actual direction it is setted
     private void setDirection(){
 
         if (player.get(0).getDirection().equals("up"))
