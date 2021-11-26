@@ -37,7 +37,7 @@ public class snake {
     public snake(Point p) {
 
         // load the assets
-        loadImage("Images/snakebody.png");
+        loadImage("Images/snakebody-texture.png");
 
         // initialize the state
         pos = new Point(p);

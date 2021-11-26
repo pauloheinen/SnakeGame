@@ -18,8 +18,8 @@ public class map extends JPanel implements KeyListener, ActionListener {
     private int points = 0;
 
     // map's configs
-    public static final int WIDTH = 300;
-    public static final int HEIGHT = 300;
+    public static final int WIDTH = 500;
+    public static final int HEIGHT = 500;
     public static final int DELAY = 420;
     public static final int TILE_SIZE = 25;
     public static final int COLUMNS = WIDTH/TILE_SIZE;
@@ -46,7 +46,6 @@ public class map extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         // this method is called by the timer every DELAY ms.
-
         move();
         player.get(0).setMovementSetted(false);
         // prevent the player from disappearing off the board
@@ -81,6 +80,8 @@ public class map extends JPanel implements KeyListener, ActionListener {
             apple.draw(g, this);
         }
 
+        drawScore(g);
+
         // this smooths out animations on some systems
         Toolkit.getDefaultToolkit().sync();
 
@@ -103,12 +104,6 @@ public class map extends JPanel implements KeyListener, ActionListener {
     }
 
     private void drawBackground(Graphics g) {
-
-        // setting fonts configs
-        String s = Integer.toString(points);
-        g.setFont(new Font(Font.SERIF, Font.BOLD, 18));
-        g.setColor(Color.white);
-        g.drawString(s, WIDTH-20, HEIGHT-5);
 
         // draw a checkered background
         // draw rectangles to watch better the X, Y thing while in development
@@ -154,16 +149,15 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
         for (food node: apple) {
             if (player.get(0).getPos().equals(node.getPos())) {
-
+                apple.remove(node);
                 points++;
-                // for every 10 points increases the game speed
-                if (points % 10 == 0)
-                    // +8% game speed
-                    timer.setDelay(timer.getDelay()-(timer.getDelay()/8));
+                // for every 6 points increases the game speed
+                if (points % 6 == 0)
+                    // +3% game speed
+                    timer.setDelay(timer.getDelay()-(timer.getDelay()/3));
 
                 Point p = player.get(player.size()-1).getLastpos();
                 player.add(new snake(p));
-                apple.remove(node);
                 return true;
             }
         }
@@ -181,21 +175,23 @@ public class map extends JPanel implements KeyListener, ActionListener {
     }
 
     // verifies and spawn a food in a grid that snake doesn't occupy
-    private void spawnFood(){
+    private void spawnFood() {
 
         Point p = new Point(random.nextInt(ROWS), random.nextInt(COLUMNS));
 
-        // for to verify if the new Point p is occupied
-        for (int j = 0; j < player.size()-1; j++) {
+        // verify if the new Point p is occupied by a snake node
+        for (int j = 0; j < player.size() - 1; j++) {
 
             if (player.get(j).getPos().equals(p)) {
-                p.move(random.nextInt(ROWS), random.nextInt(COLUMNS));
+                p.setLocation(random.nextInt(ROWS), random.nextInt(COLUMNS));
                 j = 0;
             }
 
         }
 
-        apple.add(new food(p));
+        // check if is possible to add a new apple
+        if (player.size() + apple.size() < COLUMNS * ROWS)
+            apple.add(new food(p));
 
     }
 
@@ -216,4 +212,12 @@ public class map extends JPanel implements KeyListener, ActionListener {
 
     }
 
+    private void drawScore(Graphics g){
+        // setting fonts configs
+        String s = Integer.toString(points);
+        g.setFont(new Font(Font.SERIF, Font.BOLD, 18));
+        g.setColor(Color.white);
+        g.drawString(s, WIDTH-20, HEIGHT-5);
+
+    }
 }
