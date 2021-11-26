@@ -18,9 +18,9 @@ public class map extends JPanel implements KeyListener, ActionListener {
     private int points = 0;
 
     // map's configs
-    public static final int WIDTH = 500;
-    public static final int HEIGHT = 500;
-    public static final int DELAY = 420;
+    public static final int WIDTH = 400;
+    public static final int HEIGHT = 400;
+    public static final int DELAY = 450;
     public static final int TILE_SIZE = 25;
     public static final int COLUMNS = WIDTH/TILE_SIZE;
     public static final int ROWS = HEIGHT/TILE_SIZE;
@@ -151,10 +151,10 @@ public class map extends JPanel implements KeyListener, ActionListener {
             if (player.get(0).getPos().equals(node.getPos())) {
                 apple.remove(node);
                 points++;
-                // for every 6 points increases the game speed
-                if (points % 6 == 0)
-                    // +3% game speed
-                    timer.setDelay(timer.getDelay()-(timer.getDelay()/3));
+                // for every 8 points increases the game speed
+                if (points % 8 == 0)
+                    // +10% game speed
+                    timer.setDelay(timer.getDelay()-(timer.getDelay()/10));
 
                 Point p = player.get(player.size()-1).getLastpos();
                 player.add(new snake(p));
